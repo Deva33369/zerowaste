@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [donations, setDonations] = useState([]);
+  const [foodItems, setFoodItems] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/food").then((response) => {
-      setDonations(response.data);
-    });
+    axios.get("http://192.168.1.79:3001/food") // ✅ Ensure this matches backend
+      .then((response) => {
+        setFoodItems(response.data);
+      })
+      .catch((error) => console.error("API Error:", error));
   }, []);
 
   return (
     <div>
       <h1>ZeroWaste Marketplace</h1>
-      <h2>Available Food Donations:</h2>
       <ul>
-        {donations.map((food) => (
-          <li key={food._id}>
-            {food.name} - Expiry: {food.expiryDate}
-          </li>
+        {foodItems.map((food) => (
+          <li key={food._id}>{food.name} - Expires: {food.expiryDate}</li>
         ))}
       </ul>
     </div>
