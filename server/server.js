@@ -1,32 +1,39 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const connectDB = require('./config/db');
 
+// Import routes
+const foodRoutes = require('./routes/foodRoutes');
+const userRoutes = require('./routes/userRoutes');
+const claimRoutes = require('./routes/claimRoutes');
+
+// Initialize express app
 const app = express();
+
+// Connect to database
+connectDB();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected 🚀"))
-  .catch(err => console.error(err));
+// Mount routes
+app.use('/api/food', foodRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/claims', claimRoutes);
 
-const FoodSchema = new mongoose.Schema({
-  name: String,
-  expiryDate: String
+// Simple welcome route
+app.get('/', (req, res) => {
+  res.send('Welcome to the ZeroWaste API');
 });
 
-const Food = mongoose.model("Food", FoodSchema);
-
-app.post("/donate", async (req, res) => {
-  const food = new Food(req.body);
-  await food.save();
-  res.json({ message: "Food donation added!" });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: err.message || 'Something went wrong!' });
 });
 
-app.get("/food", async (req, res) => {
-  const foodItems = await Food.find();
-  res.json(foodItems);
-});
-
-app.listen(5000, () => console.log("Backend running on port 5000"));
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
