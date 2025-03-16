@@ -1,7 +1,7 @@
-const Food = require('../models/food');
+const Food = require('../models/Food');
 
 // Get all food donations
-exports.getAllFood = async (req, res) => {
+const getFoods = async (req, res) => {
   try {
     const foodItems = await Food.find();
     res.json(foodItems);
@@ -11,8 +11,11 @@ exports.getAllFood = async (req, res) => {
 };
 
 // Create a new food donation
-exports.createFood = async (req, res) => {
+const createFood = async (req, res) => {
   try {
+    // Add the logged-in user as the donor
+    req.body.donor = req.user._id;
+    
     const food = new Food(req.body);
     await food.save();
     res.status(201).json({ message: "Food donation added!", food });
@@ -22,7 +25,7 @@ exports.createFood = async (req, res) => {
 };
 
 // Get a single food donation
-exports.getFoodById = async (req, res) => {
+const getFoodById = async (req, res) => {
   try {
     const food = await Food.findById(req.params.id);
     if (!food) {
@@ -35,15 +38,24 @@ exports.getFoodById = async (req, res) => {
 };
 
 // Update a food donation
-exports.updateFood = async (req, res) => {
+const updateFood = async (req, res) => {
   try {
-    const food = await Food.findByIdAndUpdate(req.params.id, req.body, { 
-      new: true,
-      runValidators: true 
-    });
+    let food = await Food.findById(req.params.id);
+    
     if (!food) {
       return res.status(404).json({ message: "Food donation not found" });
     }
+    
+    // Check if user is the donor
+    if (food.donor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to update this donation" });
+    }
+    
+    food = await Food.findByIdAndUpdate(req.params.id, req.body, { 
+      new: true,
+      runValidators: true 
+    });
+    
     res.json(food);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -51,20 +63,38 @@ exports.updateFood = async (req, res) => {
 };
 
 // Delete a food donation
-exports.deleteFood = async (req, res) => {
+const deleteFood = async (req, res) => {
   try {
-    const food = await Food.findByIdAndDelete(req.params.id);
+    const food = await Food.findById(req.params.id);
+    
     if (!food) {
       return res.status(404).json({ message: "Food donation not found" });
     }
+    
+    // Check if user is the donor
+    if (food.donor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this donation" });
+    }
+    
+    await Food.findByIdAndDelete(req.params.id);
     res.json({ message: "Food donation deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// Get user's donations
+const getMyDonations = async (req, res) => {
+  try {
+    const foodItems = await Food.find({ donor: req.user._id });
+    res.json(foodItems);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get nearby food donations
-exports.getNearbyFood = async (req, res) => {
+const getNearbyFood = async (req, res) => {
   try {
     const { longitude, latitude, maxDistance = 10000 } = req.query; // maxDistance in meters (default: 10km)
     
@@ -91,62 +121,12 @@ exports.getNearbyFood = async (req, res) => {
   }
 };
 
-// Add these lines to the createFood function
-exports.createFood = async (req, res) => {
-    try {
-      // Add the logged-in user as the donor
-      req.body.donor = req.user._id;
-      
-      const food = new Food(req.body);
-      await food.save();
-      res.status(201).json({ message: "Food donation added!", food });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  };
-  
-  // Modify the updateFood function
-  exports.updateFood = async (req, res) => {
-    try {
-      let food = await Food.findById(req.params.id);
-      
-      if (!food) {
-        return res.status(404).json({ message: "Food donation not found" });
-      }
-      
-      // Check if user is the donor
-      if (food.donor.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ message: "Not authorized to update this donation" });
-      }
-      
-      food = await Food.findByIdAndUpdate(req.params.id, req.body, { 
-        new: true,
-        runValidators: true 
-      });
-      
-      res.json(food);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  };
-  
-  // Similarly, modify the deleteFood function
-  exports.deleteFood = async (req, res) => {
-    try {
-      const food = await Food.findById(req.params.id);
-      
-      if (!food) {
-        return res.status(404).json({ message: "Food donation not found" });
-      }
-      
-      // Check if user is the donor
-      if (food.donor.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ message: "Not authorized to delete this donation" });
-      }
-      
-      await Food.findByIdAndDelete(req.params.id);
-      res.json({ message: "Food donation deleted" });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+module.exports = {
+  getFoods,
+  getFoodById,
+  createFood,
+  updateFood,
+  deleteFood,
+  getMyDonations,
+  getNearbyFood
+};
