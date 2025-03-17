@@ -1,31 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  getAllFood,
-  createFood,
+const { protect, donor } = require('../middleware/authMiddleware');
+const {
+  getFoods,
   getFoodById,
+  createFood,
   updateFood,
   deleteFood,
+  getMyDonations,
   getNearbyFood
 } = require('../controllers/foodController');
-const { protect, authorize } = require('../middleware/auth');
 
-// GET all food donations - public
-router.get('/', getAllFood);
+// Public routes
+router.get('/', getFoods);
 
-// POST a new food donation - donor only
-router.post('/', protect, authorize('donor'), createFood);
+// Donor routes - Need to come BEFORE /:id route
+router.get('/my-donations', protect, donor, getMyDonations);
 
-// GET food donations near a location - public
-router.get('/nearby', getNearbyFood);
+// Recipient routes - Need to come BEFORE /:id route
+router.get('/nearby/:distance', protect, getNearbyFood);
 
-// GET a specific food donation - public
+// Item by ID route (should come after more specific routes)
 router.get('/:id', getFoodById);
 
-// Update a food donation - donor only
-router.put('/:id', protect, authorize('donor'), updateFood);
-
-// Delete a food donation - donor only
-router.delete('/:id', protect, authorize('donor'), deleteFood);
+// Protected routes
+router.post('/', protect, donor, createFood);
+router.put('/:id', protect, donor, updateFood);
+router.delete('/:id', protect, donor, deleteFood);
 
 module.exports = router;

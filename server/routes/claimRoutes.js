@@ -1,19 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const { protect, donor, recipient } = require('../middleware/authMiddleware');
 const {
   createClaim,
   getMyClaims,
-  updateClaimStatus
+  getReceivedClaims,
+  getClaimById,
+  updateClaimStatus,
+  deleteClaim,
+  approveClaim,
+  rejectClaim,
+  completeClaim
 } = require('../controllers/claimController');
-const { protect, authorize } = require('../middleware/auth');
 
-// Create a new claim (recipients only)
-router.post('/', protect, authorize('recipient'), createClaim);
+// Recipient routes
+router.post('/', protect, recipient, createClaim);
+router.get('/my-claims', protect, recipient, getMyClaims);
 
-// Get all claims for the logged-in user (both donors and recipients)
-router.get('/', protect, getMyClaims);
+// Donor routes
+router.get('/received', protect, donor, getReceivedClaims);
 
-// Update claim status (donors only)
-router.put('/:id', protect, authorize('donor'), updateClaimStatus);
+// Common routes
+router.get('/:id', protect, getClaimById);
+router.put('/:id', protect, updateClaimStatus);
+router.delete('/:id', protect, deleteClaim);
+
+// Specific status update routes
+router.put('/:id/approve', protect, donor, approveClaim);
+router.put('/:id/reject', protect, donor, rejectClaim);
+router.put('/:id/complete', protect, completeClaim);
 
 module.exports = router; 

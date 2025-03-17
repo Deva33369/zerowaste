@@ -21,6 +21,10 @@ const UserSchema = new mongoose.Schema({
     enum: ['donor', 'recipient'],
     required: true
   },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
   phone: String,
   address: {
     street: String,
