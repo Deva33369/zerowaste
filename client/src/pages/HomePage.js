@@ -19,6 +19,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { useAuth } from '../context/AuthContext';
+import Navigation from '../components/Navigation'; // Import the Navigation component
 
 // Animated components
 const MotionBox = motion(Box);
@@ -176,6 +177,9 @@ const HomePage = () => {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Navigation Section */}
+      <Navigation />
 
       {/* Features Section */}
       <Box sx={{ bgcolor: 'background.paper', py: 8 }}>

@@ -19,6 +19,15 @@ import FoodDetailPage from "./pages/FoodDetailPage";
 import CreateFoodPage from "./pages/CreateFoodPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import CreateWasteItemPage from "./pages/CreateWasteItemPage";
+
+// New Features
+import EnvironmentalImpactCalculator from "./pages/EnvironmentalImpactCalculator";
+import FoodEducationHub from "./pages/FoodEducationHub";
+
+// Marketplace Components
+import FoodMarketplace from "./pages/FoodMarketplace";  // Marketplace UI
+import FoodListingForm from "./pages/FoodListingForm";  // Form for restaurants
 
 // Guards
 import PrivateRoute from "./components/guards/PrivateRoute";
@@ -78,7 +87,7 @@ function App() {
                 <Route path="/food" element={<FoodListingPage />} />
                 <Route path="/food/:id" element={<FoodDetailPage />} />
                 <Route 
-                  path="/food/create" 
+                  path="/create-food" 
                   element={
                     <PrivateRoute>
                       <CreateFoodPage />
@@ -93,6 +102,33 @@ function App() {
                     </PrivateRoute>
                   } 
                 />
+                
+                {/* Waste Items Routes */}
+                <Route path="/waste-items" element={<FoodListingPage />} /> {/* Assuming we use same listing pattern */}
+                <Route 
+                  path="/waste-items/create" 
+                  element={
+                    <PrivateRoute>
+                      <CreateWasteItemPage />
+                    </PrivateRoute>
+                  } 
+                />
+                
+                {/* Marketplace Routes */}
+                <Route path="/marketplace" element={<FoodMarketplace />} /> {/* Browse & Buy Food */}
+                <Route 
+                  path="/food-listing" 
+                  element={
+                    <PrivateRoute>
+                      <FoodListingForm />
+                    </PrivateRoute>
+                  } 
+                /> {/* Only restaurants can list food */}
+                
+                {/* New Feature Routes */}
+                <Route path="/environmental-impact" element={<EnvironmentalImpactCalculator />} />
+                <Route path="/education" element={<FoodEducationHub />} />
+                
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>

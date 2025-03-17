@@ -15,9 +15,7 @@ import {
   Breadcrumbs,
   Alert,
   CircularProgress,
-  Chip,
-  IconButton,
-  Tooltip
+  IconButton
 } from '@mui/material';
 import {
   NavigateNext as NavigateNextIcon,
@@ -502,4 +500,4 @@ const CreateWasteItemPage = () => {
   );
 };
 
-export default CreateWasteItemPage; 
+export default CreateWasteItemPage;
