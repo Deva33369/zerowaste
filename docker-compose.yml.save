@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  backend:
+    build: ./server
+    ports:
+      - "5002:5002"
+    container_name: zerowaste-backend
+    restart: always
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - zerowaste-network
+
+  frontend:
+    build: ./client
+    ports:
+      - "80:80"
+    container_name: zerowaste-frontend
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - zerowaste-network
+
+networks:
+  zerowaste-network:
+    driver: bridge
+
+

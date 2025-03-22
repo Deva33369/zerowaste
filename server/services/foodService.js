@@ -66,6 +66,12 @@ const notifyDonorsAboutExpiredFood = async (expiredFood) => {
     return;
   }
   
+  // Skip email sending if configuration is missing
+  if (!process.env.EMAIL_SERVICE || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.log('Email configuration missing, skipping notification emails');
+    return;
+  }
+  
   // Create email transporter
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
@@ -175,6 +181,12 @@ const notifyDonorsAboutExpiringFood = async (expiringFood) => {
   
   // Skip if no donors to notify
   if (Object.keys(foodByDonor).length === 0) {
+    return;
+  }
+  
+  // Skip email sending if configuration is missing
+  if (!process.env.EMAIL_SERVICE || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.log('Email configuration missing, skipping notification emails');
     return;
   }
   

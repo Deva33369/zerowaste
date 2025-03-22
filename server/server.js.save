@@ -94,9 +94,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Force a specific port to avoid conflicts
-const PORT = 5002;
-// Comment out any other PORT declarations
+// Start server
+const PORT = process.env.PORT || 5002;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-module.exports = { app, server, io };
